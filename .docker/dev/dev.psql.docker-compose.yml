@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  bscsweb-development-postgres:
+    restart: unless-stopped
+    env_file: ../../.env
+    image: postgres
+    volumes:
+      # In case we need to import the database for the first time.
+      # - './fieldscope_org.sql:/fieldscope_org.sql'
+      - '../../postgres-data:/var/lib/postgresql/data'
+    ports:
+        - "5433:5432"
+          #expose:
+          #- 5432
+    environment:
+      - NETWORK_ACCESS=internal
+
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  markhor-development:
+    restart: unless-stopped
+    env_file: ../../.env
+    build:
+        context: ../../.
+        dockerfile: ./.docker/dev/dev.Dockerfile
+    image: markhor-development
+    ports:
+      - "8888:80"
+    command: python3 ./server.py
+    environment:
+      - NETWORK_ACCESS=internal
+
+  pymail-development-nginx:
+    restart: unless-stopped
+    image: nginx
+    volumes:
+       - './dev.default.conf:/etc/nginx/conf.d/default.conf'
+    depends_on:
+      - markhor-development
+    environment:
+      - VIRTUAL_HOST=127.0.0.1
+
+networks:
+  default:
+    external:
+      name: nginx-proxy

@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  markhor-prod:
+    restart: unless-stopped
+    env_file: ../../.env
+    build:
+        context: ../../.
+        dockerfile: ./.docker/prod/prod.Dockerfile
+    ports:
+      - "8009:80"
+    command: python3 ./server.py
+    environment:
+      - NETWORK_ACCESS=internal
+    volumes:
+      - "/home/bscs/certs:/etc/ssl/certs"
+
+  markhor-nginx-prod:
+    restart: unless-stopped
+    image: nginx
+    volumes:
+       - './prod.default.conf:/etc/nginx/conf.d/default.conf'
+    depends_on:
+      - markhor-prod
+    environment:
+      - VIRTUAL_HOST=markhor.bscs.org
+
+networks:
+  default:
+    external:
+      name: nginx-proxy
